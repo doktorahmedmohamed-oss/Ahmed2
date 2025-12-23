@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>أرشفة مكتب محاسبة</title>
+
+<style>
+body{
+    font-family: Arial;
+    direction: rtl;
+    margin: 20px;
+}
+.section{
+    border:1px solid #ccc;
+    padding:15px;
+    margin-bottom:20px;
+}
+input, select, button{
+    padding:8px;
+    margin:6px 0;
+    width:100%;
+    box-sizing:border-box;
+}
+button{
+    cursor:pointer;
+    border:none;
+    font-size:16px;
+}
+button.save{background:#6c757d;color:#fff;}
+button.add{background:#007bff;color:#fff;}
+button.delete{background:#dc3545;color:#fff;}
+button.edit{background:#28a745;color:#fff;}
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+th, td{
+    border:1px solid #000;
+    padding:6px;
+    text-align:center;
+}
+th{background:#f2f2f2;}
+.actions button{
+    width:auto;
+    margin:2px;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📁 أرشفة ملفات مكتب محاسبة</h2>
+
+<form class="section" id="clientForm">
+<h3>➕ بيانات الممول</h3>
+
+<input id="serial" placeholder="رقم المسلسل">
+<input id="clientName" placeholder="اسم الممول">
+<input id="activity" placeholder="طبيعة النشاط">
+<input id="username" placeholder="اسم المستخدم">
+<input id="password" placeholder="كلمة المرور">
+
+<select id="declaration">
+    <option value="">قدم الإقرار؟</option>
+    <option value="نعم">نعم</option>
+    <option value="لا">لا</option>
+</select>
+
+<input id="subscription" placeholder="قيمة الاشتراك" type="number">
+<input id="fees" placeholder="الأتعاب" type="number">
+<input id="total" placeholder="الإجمالي" readonly>
+<input id="cash" placeholder="نقدي" type="number">
+<input id="visa" placeholder="فيزا" type="number">
+
+<button type="button" class="save" onclick="saveOnly()">حفظ</button>
+<button type="button" class="add" onclick="addClient()">➕ إضافة ممول</button>
+</form>
+
+<div class="section">
+<input id="searchInput" placeholder="🔍 بحث بالرقم أو الاسم أو النشاط">
+</div>
+
+<table>
+<thead>
+<tr>
+<th>رقم</th>
+<th>اسم</th>
+<th>النشاط</th>
+<th>المستخدم</th>
+<th>كلمة المرور</th>
+<th>الإقرار</th>
+<th>الاشتراك</th>
+<th>الأتعاب</th>
+<th>الإجمالي</th>
+<th>نقدي</th>
+<th>فيزا</th>
+<th>إجراءات</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+
+<script>
+let clients = JSON.parse(localStorage.getItem("clients")) || [];
+let editIndex = null;
+
+/* عناصر */
+const serial = document.getElementById("serial");
+const clientName = document.getElementById("clientName");
+const activity = document.getElementById("activity");
+const username = document.getElementById("username");
+const password = document.getElementById("password");
+const declaration = document.getElementById("declaration");
+const subscription = document.getElementById("subscription");
+const fees = document.getElementById("fees");
+const total = document.getElementById("total");
+const cash = document.getElementById("cash");
+const visa = document.getElementById("visa");
+const tableBody = document.getElementById("tableBody");
+const searchInput = document.getElementById("searchInput");
+
+/* حساب الإجمالي */
+function calculateTotal(){
+    total.value = (Number(subscription.value)||0) + (Number(fees.value)||0);
+}
+subscription.oninput = calculateTotal;
+fees.oninput = calculateTotal;
+
+/* حفظ فقط */
+function saveOnly(){
+    alert("تم حفظ البيانات مؤقتًا، اضغط (إضافة ممول) لإضافته للجدول");
+}
+
+/* إضافة ممول */
+function addClient(){
+    const client = {
+        serial: serial.value,
+        name: clientName.value,
+        activity: activity.value,
+        username: username.value,
+        password: password.value,
+        declaration: declaration.value,
+        subscription: subscription.value,
+        fees: fees.value,
+        total: total.value,
+        cash: cash.value,
+        visa: visa.value
+    };
+
+    if(client.serial === "" || client.name === ""){
+        alert("رقم المسلسل واسم الممول مطلوبين");
+        return;
+    }
+
+    if(editIndex === null){
+        clients.push(client);
+    }else{
+        clients[editIndex] = client;
+        editIndex = null;
+    }
+
+    localStorage.setItem("clients", JSON.stringify(clients));
+    document.getElementById("clientForm").reset();
+    renderTable();
+}
+
+/* حذف */
+function deleteClient(i){
+    if(confirm("تأكيد الحذف؟")){
+        clients.splice(i,1);
+        localStorage.setItem("clients", JSON.stringify(clients));
+        renderTable();
+    }
+}
+
+/* تعديل */
+function editClient(i){
+    const c = clients[i];
+    serial.value = c.serial;
+    clientName.value = c.name;
+    activity.value = c.activity;
+    username.value = c.username;
+    password.value = c.password;
+    declaration.value = c.declaration;
+    subscription.value = c.subscription;
+    fees.value = c.fees;
+    total.value = c.total;
+    cash.value = c.cash;
+    visa.value = c.visa;
+    editIndex = i;
+}
+
+/* عرض + بحث */
+searchInput.onkeyup = renderTable;
+
+function renderTable(){
+    tableBody.innerHTML = "";
+    const s = searchInput.value.toLowerCase();
+
+    clients.forEach((c,i)=>{
+        if(`${c.serial} ${c.name} ${c.activity}`.toLowerCase().includes(s)){
+            tableBody.innerHTML += `
+            <tr>
+                <td>${c.serial}</td>
+                <td>${c.name}</td>
+                <td>${c.activity}</td>
+                <td>${c.username}</td>
+                <td>${c.password}</td>
+                <td>${c.declaration}</td>
+                <td>${c.subscription}</td>
+                <td>${c.fees}</td>
+                <td>${c.total}</td>
+                <td>${c.cash}</td>
+                <td>${c.visa}</td>
+                <td class="actions">
+                    <button class="edit" onclick="editClient(${i})">تعديل</button>
+                    <button class="delete" onclick="deleteClient(${i})">حذف</button>
+                </td>
+            </tr>`;
+        }
+    });
+}
+
+renderTable();
+</script>
+
+</body>
+</html>
