@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>آلة حاسبة علمية كاملة</title>
+
+<style>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background:#ddd;
+    font-family: Arial;
+}
+
+.calculator {
+    background: #222;
+    padding: 15px;
+    border-radius: 10px;
+    width: 320px;
+}
+
+#screen {
+    width: 100%;
+    height: 50px;
+    font-size: 22px;
+    text-align: right;
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+button {
+    height: 45px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="calculator">
+    <input type="text" id="screen" disabled>
+
+    <div class="buttons">
+        <button onclick="clearScreen()">C</button>
+<button onclick="backspace()">⌫</button>
+        
+        <button onclick="sqrt()">√</button>
+        <button onclick="cbrt()">∛</button>
+        <button onclick="percent()">%</button>
+
+        <button onclick="square()">x²</button>
+        <button onclick="cube()">x³</button>
+        <button onclick="add('**')">xʸ</button>
+        <button onclick="add('/')">÷</button>
+        <button onclick="add('(')">(</button>
+          <button onclick="add(')')">)</button>
+           <button onclick="The latest result(ou)">Ans</button>
+          
+        
+
+
+
+        <button onclick="sin()">sin</button>
+        <button onclick="cos()">cos</button>
+        <button onclick="tan()">tan</button>
+        <button onclick="add('*')">×</button>
+
+        <button onclick="add('7')">7</button>
+        <button onclick="add('8')">8</button>
+        <button onclick="add('9')">9</button>
+        <button onclick="add('-')">−</button>
+      
+
+        <button onclick="add('4')">4</button>
+        <button onclick="add('5')">5</button>
+        <button onclick="add('6')">6</button>
+        <button onclick="add('+')">+</button>
+       
+
+        <button onclick="add('1')">1</button>
+        <button onclick="add('2')">2</button>
+        <button onclick="add('3')">3</button>
+        <button onclick="calc()">=</button>
+
+        <button onclick="add('0')">0</button>
+        <button onclick="add('.')">.</button>
+        <button disabled></button>
+        <button disabled></button>
+    </div>
+</div>
+
+<script>
+let screen = document.getElementById("screen");
+
+function add(value) {
+    screen.value += value;
+}
+function backspace() {
+    screen.value = screen.value.slice(0, -1);
+}
+
+function clearScreen() {
+    screen.value = "";
+}
+
+function calc() {
+    try {
+        screen.value = eval(screen.value);
+    } catch {
+        screen.value = "خطأ";
+    }
+}
+
+function square() {
+    if (screen.value !== "")
+        screen.value = Math.pow(Number(screen.value), 2);
+}
+
+function cube() {
+    if (screen.value !== "")
+        screen.value = Math.pow(Number(screen.value), 3);
+}
+
+function sqrt() {
+    let v = Number(screen.value);
+    if (v < 0) screen.value = "خطأ";
+    else if (screen.value !== "") screen.value = Math.sqrt(v);
+}
+
+function cbrt() {
+    if (screen.value !== "")
+        screen.value = Math.cbrt(Number(screen.value));
+}
+
+function percent() {
+    if (screen.value !== "")
+        screen.value = Number(screen.value) / 100;
+}
+
+// النسب المثلثية (بالدرجات)
+function sin() {
+    if (screen.value !== "")
+        screen.value = Math.sin(Number(screen.value) * Math.PI / 180);
+}
+
+function cos() {
+    if (screen.value !== "")
+        screen.value = Math.cos(Number(screen.value) * Math.PI / 180);
+}
+
+function tan() {
+    if (screen.value !== "")
+        screen.value = Math.tan(Number(screen.value) * Math.PI / 180);
+}
+</script>
+
+</body>
+</html>
